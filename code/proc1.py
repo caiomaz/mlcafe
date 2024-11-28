@@ -54,11 +54,11 @@ def processar_dados():
 
         # Reorganizar as colunas conforme o requisito
         dados_finais = dados_combinados[
-            ["Municípios", "Mesorregiões", "Microrregiões", "Ano", "Produção (kg/ha)"]
+            ["Município", "Mesorregiões", "Microrregiões", "Ano", "Produção (kg/ha)"]
         ]
 
         # Salvar o resultado em um arquivo CSV
-        dados_finais.to_csv("prod-cafe-atualizado.csv", index=False, encoding="utf-8")
+        dados_finais.to_csv("../docs/prod-cafe-atualizado.csv", index=False, encoding="utf-8")
         print("Arquivo 'prod-cafe-atualizado.csv' gerado com sucesso.")
 
     except Exception as e:
