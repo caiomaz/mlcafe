@@ -15,9 +15,7 @@ def processar_dados():
         # Verificar colunas obrigatórias
         colunas_prod_cafe = {"Cidades", "Ano", "Produção (kg/ha)"}
         colunas_cidades_mg = {
-            "Código da Mesorregião",
             "Nome da Mesorregião",
-            "Código da Microrregião",
             "Nome da Microrregião",
             "Município",
         }
@@ -35,23 +33,32 @@ def processar_dados():
         # Renomear colunas para uniformizar
         prod_cafe.rename(columns={"Cidades": "Município"}, inplace=True)
 
-        # Realizar a junção dos dados com base no município
-        dados_combinados = pd.merge(prod_cafe, cidades_mg, how="left", on="Município")
+        # Selecionar apenas as colunas relevantes de cidades_mg
+        cidades_mg_relevantes = cidades_mg[
+            ["Município", "Nome da Mesorregião", "Nome da Microrregião"]
+        ]
 
-        # Verificar se há cidades em 'prod-cafe.xlsx' sem correspondência em 'cidades-mg.xlsx'
-        cidades_sem_correspondencia = dados_combinados[
-            dados_combinados["Código da Mesorregião"].isna()
-        ]["Município"].unique()
-        if len(cidades_sem_correspondencia) > 0:
-            print(
-                "Atenção: As seguintes cidades não têm correspondência em 'cidades-mg.xlsx':"
-            )
-            print(cidades_sem_correspondencia)
+        # Realizar a junção dos dados com base no município
+        dados_combinados = pd.merge(
+            prod_cafe, cidades_mg_relevantes, how="left", on="Município"
+        )
+
+        # Renomear colunas no resultado final
+        dados_combinados.rename(
+            columns={
+                "Nome da Mesorregião": "Mesorregiões",
+                "Nome da Microrregião": "Microrregiões",
+            },
+            inplace=True,
+        )
+
+        # Reorganizar as colunas conforme o requisito
+        dados_finais = dados_combinados[
+            ["Municípios", "Mesorregiões", "Microrregiões", "Ano", "Produção (kg/ha)"]
+        ]
 
         # Salvar o resultado em um arquivo CSV
-        dados_combinados.to_csv(
-            "../docs/prod-cafe-atualizado.csv", index=False, encoding="utf-8"
-        )
+        dados_finais.to_csv("prod-cafe-atualizado.csv", index=False, encoding="utf-8")
         print("Arquivo 'prod-cafe-atualizado.csv' gerado com sucesso.")
 
     except Exception as e:
