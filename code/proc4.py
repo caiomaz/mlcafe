@@ -1,48 +1,51 @@
 import pandas as pd
 import time
+import os
 
-def calcular_media_entre_planilhas(caminho_csv1, caminho_csv2, caminho_saida):
+def calcular_media_entre_varias_planilhas(caminhos_csv, caminho_saida):
     """
-    Calcula a média das colunas entre duas planilhas de médias e salva o resultado em um novo arquivo CSV.
+    Calcula a média das colunas entre várias planilhas e salva o resultado em um novo arquivo CSV.
 
     Args:
-        caminho_csv1 (str): Caminho do primeiro arquivo CSV.
-        caminho_csv2 (str): Caminho do segundo arquivo CSV.
-        caminho_saida (str): Caminho do arquivo CSV de saída com as médias.
+        caminhos_csv (list): Lista de caminhos dos arquivos CSV.
+        caminho_saida (str): Caminho do diretório de saída.
     """
     try:
         # Marcar o tempo inicial
         inicio = time.time()
 
-        # Ler as duas planilhas de médias
-        dados1 = pd.read_csv(caminho_csv1, sep=";", encoding="utf-8", decimal=",")
-        dados2 = pd.read_csv(caminho_csv2, sep=";", encoding="utf-8", decimal=",")
+        # Verificar se há arquivos suficientes
+        if len(caminhos_csv) < 2:
+            raise ValueError("É necessário pelo menos dois arquivos para calcular as médias.")
 
-        # Verificar se as colunas das duas planilhas são iguais
-        if not dados1.columns.equals(dados2.columns):
-            raise ValueError("As colunas das duas planilhas não são iguais.")
+        # Criar diretório de saída, se não existir
+        os.makedirs(caminho_saida, exist_ok=True)
 
-        # Criar um novo DataFrame para armazenar as médias
-        medias_totais = {}
+        # Ler todas as planilhas
+        dados_lista = [pd.read_csv(caminho, sep=";", encoding="utf-8", decimal=",") for caminho in caminhos_csv]
 
-        # Calcular a média entre as duas planilhas para cada coluna
-        for coluna in dados1.columns:
-            if coluna != "Média":  # Ignorar se existir uma coluna não numérica como índice
-                medias_totais[f"{coluna} Total"] = (dados1[coluna] + dados2[coluna]) / 2
+        # Verificar se todas as planilhas têm as mesmas colunas
+        colunas_comuns = dados_lista[0].columns
+        for i, dados in enumerate(dados_lista[1:], start=2):
+            if not colunas_comuns.equals(dados.columns):
+                raise ValueError(f"As colunas da planilha {i} não correspondem às da primeira planilha.")
 
-        # Criar um DataFrame com as médias
-        df_medias_totais = pd.DataFrame(medias_totais)
+        # Calcular a média entre todas as planilhas
+        df_medias_totais = sum(dados_lista) / len(dados_lista)
 
-        # Salvar o DataFrame de médias em um novo arquivo CSV
+        # Adicionar " Total" ao nome das colunas
+        df_medias_totais.columns = [f"{coluna} Total" for coluna in df_medias_totais.columns]
+
+        # Salvar o DataFrame em um novo arquivo CSV
+        caminho_saida_arquivo = os.path.join(caminho_saida, "medias-totais.csv")
         df_medias_totais.to_csv(
-            caminho_saida,
+            caminho_saida_arquivo,
             index=False,
             encoding="utf-8",
             sep=";",
             decimal=","
         )
-
-        print(f"Arquivo de médias 'Total' gerado com sucesso: {caminho_saida}")
+        print(f"Arquivo de médias 'Total' gerado com sucesso: {caminho_saida_arquivo}")
 
         # Marcar o tempo final e calcular a diferença
         fim = time.time()
@@ -53,9 +56,12 @@ def calcular_media_entre_planilhas(caminho_csv1, caminho_csv2, caminho_saida):
         print(f"Erro ao processar os dados: {e}")
 
 # Exemplo de uso:
-# Substitua os caminhos pelos caminhos dos seus arquivos de entrada e saída.
-caminho_csv1 = "../docs/medias-passos.csv"  # Caminho do primeiro arquivo CSV de médias
-caminho_csv2 = "../docs/medias-varginha.csv"  # Caminho do segundo arquivo CSV de médias
-caminho_saida = "../docs/medias-total.csv"  # Caminho do arquivo CSV de saída com as médias totais
+caminhos_csv = [
+    "../docs/proc4/input/2012/medias-caldas.csv",
+    "../docs/proc4/input/2012/medias-passos.csv",
+    "../docs/proc4/input/2012/medias-varginha.csv",
+    "../docs/proc4/input/2012/medias-passa-quatro.csv"
+]
+caminho_saida = "../docs/proc4/output/2012"
 
-calcular_media_entre_planilhas(caminho_csv1, caminho_csv2, caminho_saida)
+calcular_media_entre_varias_planilhas(caminhos_csv, caminho_saida)

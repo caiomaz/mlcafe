@@ -70,6 +70,12 @@ def calcular_medias(caminho_csv, caminho_saida):
 
         # Verificar se as colunas especificadas existem no arquivo
         colunas_existentes = [col for col in colunas if col in dados_filtrados.columns]
+        colunas_faltantes = [col for col in colunas if col not in dados_filtrados.columns]
+
+        if colunas_faltantes:
+            print("As seguintes colunas estão faltando no arquivo:")
+            for coluna in colunas_faltantes:
+                print(f" - {coluna}")
 
         if not colunas_existentes:
             raise ValueError("Nenhuma das colunas especificadas foi encontrada no arquivo.")
@@ -101,8 +107,7 @@ def calcular_medias(caminho_csv, caminho_saida):
         print(f"Erro ao processar os dados: {e}")
 
 # Exemplo de uso:
-# Substitua os caminhos pelos caminhos do seu arquivo de entrada e saída.
-caminho_csv = "../docs/varginha-geral.csv"  # Caminho do arquivo CSV de entrada
-caminho_saida = "../docs/varginha-medias.csv"  # Caminho do arquivo CSV de saída
+caminho_csv = "../docs/proc3-pre/output/2012/passa-quatro.csv"  # Caminho do arquivo CSV de entrada
+caminho_saida = "../docs/proc4/input/2012/medias-passa-quatro.csv"  # Caminho do arquivo CSV de saída
 
 calcular_medias(caminho_csv, caminho_saida)
