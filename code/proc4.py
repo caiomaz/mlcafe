@@ -57,11 +57,11 @@ def calcular_media_entre_varias_planilhas(caminhos_csv, caminho_saida):
 
 # Exemplo de uso:
 caminhos_csv = [
-    "../docs/proc4/input/2012/medias-caldas.csv",
-    "../docs/proc4/input/2012/medias-passos.csv",
-    "../docs/proc4/input/2012/medias-varginha.csv",
-    "../docs/proc4/input/2012/medias-passa-quatro.csv"
+    "../docs/proc4/input/2021/medias-caldas.csv",
+    "../docs/proc4/input/2021/medias-passos.csv",
+    "../docs/proc4/input/2021/medias-varginha.csv",
+    "../docs/proc4/input/2021/medias-passa-quatro.csv"
 ]
-caminho_saida = "../docs/proc4/output/2012"
+caminho_saida = "../docs/proc4/output/2021"
 
 calcular_media_entre_varias_planilhas(caminhos_csv, caminho_saida)
